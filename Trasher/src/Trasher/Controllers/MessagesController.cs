@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Connector;
+using Trasher.CommandHandlers;
 
 namespace Trasher.Controllers
 {
@@ -19,12 +20,13 @@ namespace Trasher.Controllers
             if (activity.Type == ActivityTypes.Message)
             {
                 ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                // calculate something for us to return
-                int length = (activity.Text ?? string.Empty).Length;
-
-                // return our reply to the user
-                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
-                await connector.Conversations.ReplyToActivityAsync(reply);
+                string replyText = GetReplyText(activity.Text ?? string.Empty);
+                
+                if(string.IsNullOrEmpty(replyText) == false)
+                {
+                    Activity reply = activity.CreateReply(replyText);
+                    await connector.Conversations.ReplyToActivityAsync(reply);
+                }
             }
             else
             {
@@ -32,6 +34,16 @@ namespace Trasher.Controllers
             }
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
+        }
+
+        private string GetReplyText(string command)
+        {
+            if (command == "kak")
+            {
+                return new KaktamCommandHandler().GetInfo(command);
+            }
+
+            return string.Empty;
         }
 
         private Activity HandleSystemMessage(Activity message)
