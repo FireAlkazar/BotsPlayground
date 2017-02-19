@@ -38,9 +38,14 @@ namespace Trasher.Controllers
 
         private string GetReplyText(string command)
         {
-            if (command == "kak")
+            if (command == "kak" || command.Contains("kak ") || command.Contains(" kak"))
             {
                 return new KaktamCommandHandler().GetInfo(command);
+            }
+
+            if (command.Contains("echo "))
+            {
+                return command;
             }
 
             return string.Empty;
