@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -17,21 +18,38 @@ namespace Trasher.Controllers
         /// </summary>
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
-            if (activity.Type == ActivityTypes.Message)
+            if (activity.Type != ActivityTypes.Message)
             {
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                string replyText = GetReplyText(activity.Text ?? string.Empty);
-                
-                if(string.IsNullOrEmpty(replyText) == false)
-                {
-                    Activity reply = activity.CreateReply(replyText);
-                    await connector.Conversations.ReplyToActivityAsync(reply);
-                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+            string replyText = GetReplyText(activity.Text ?? string.Empty);
+
+            if (string.IsNullOrEmpty(replyText))
+            {
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            Activity reply;
+            if (Uri.IsWellFormedUriString(replyText, UriKind.Absolute))
+            {
+                reply = activity.CreateReply(replyText);
+                //string urlExtension = Path.GetExtension(replyText);
+                //string extension = urlExtension == string.Empty ? "jpg" : urlExtension;
+                //reply.Attachments.Add(new Attachment
+                //{
+                //    ContentUrl = replyText,
+                //    ContentType = "image/" + extension
+                //});
             }
             else
             {
-                HandleSystemMessage(activity);
+                reply = activity.CreateReply(replyText);
             }
+
+
+            await connector.Conversations.ReplyToActivityAsync(reply);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
         }
@@ -41,6 +59,11 @@ namespace Trasher.Controllers
             if (command == "kak" || command.Contains("kak ") || command.Contains(" kak"))
             {
                 return new KaktamCommandHandler().GetInfo(command);
+            }
+
+            if (command.Contains(" img "))
+            {
+                return new RandomImageCommandHandler().GetInfo(command);
             }
 
             if (command.Contains("echo "))
