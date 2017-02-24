@@ -38,8 +38,8 @@ namespace Trasher.CommandHandlers
             HttpClient httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri("https://www.googleapis.com");
             var random = new Random();
-            int startIndex = random.Next(0, 10);
-            var query = $"/customsearch/v1?q={command}&cx={ConfigurationManager.AppSettings["GoogleCustomSearchId"]}&imgSize=medium&key={ConfigurationManager.AppSettings["GoogleApiKey"]}&start={startIndex}";
+            int startIndex = random.Next(1, 3);
+            var query = $"/customsearch/v1?q={Uri.EscapeDataString(command)}&cx={ConfigurationManager.AppSettings["GoogleCustomSearchId"]}&imgSize=medium&key={ConfigurationManager.AppSettings["GoogleApiKey"]}&start={startIndex}";
             using (httpClient)
             {
                 HttpResponseMessage response = httpClient

@@ -31,23 +31,7 @@ namespace Trasher.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
-            Activity reply;
-            if (Uri.IsWellFormedUriString(replyText, UriKind.Absolute))
-            {
-                reply = activity.CreateReply(replyText);
-                //string urlExtension = Path.GetExtension(replyText);
-                //string extension = urlExtension == string.Empty ? "jpg" : urlExtension;
-                //reply.Attachments.Add(new Attachment
-                //{
-                //    ContentUrl = replyText,
-                //    ContentType = "image/" + extension
-                //});
-            }
-            else
-            {
-                reply = activity.CreateReply(replyText);
-            }
-
+            Activity reply = activity.CreateReply(replyText);
 
             await connector.Conversations.ReplyToActivityAsync(reply);
             var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -69,6 +53,11 @@ namespace Trasher.Controllers
             if (command.Contains("echo "))
             {
                 return command;
+            }
+
+            if (command.Contains(" lurk"))
+            {
+                return new LurkCommandHandler().GetInfo(command);
             }
 
             return string.Empty;
