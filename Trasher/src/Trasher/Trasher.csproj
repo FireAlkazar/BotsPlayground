@@ -121,6 +121,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="CommandHandlers\LurkCommandHandler.cs" />
     <Compile Include="CommandHandlers\RandomImageCommandHandler.cs" />
+    <Compile Include="CommandHandlers\Services\RandomWordsService.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

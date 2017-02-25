@@ -8,6 +8,7 @@ namespace Trasher.CommandHandlers
     public class LurkCommandHandler
     {
         private const string BaseUri = @"https://lurkmore.co";
+        private const string Query = @"/api.php?format=json&action=query&generator=random&grnnamespace=0&prop=revisions&rvprop=content";
         private static readonly string _skypeLineSeparator = "  " + Environment.NewLine;
 
         public string GetInfo(string command)
@@ -17,7 +18,7 @@ namespace Trasher.CommandHandlers
             using (httpClient)
             {
                 HttpResponseMessage response = httpClient.
-                    GetAsync(@"/api.php?format=json&action=query&generator=random&grnnamespace=0&prop=revisions&rvprop=content")
+                    GetAsync(Query)
                     .Result;
 
                 if (response.IsSuccessStatusCode == false)

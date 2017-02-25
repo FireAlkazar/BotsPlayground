@@ -45,7 +45,7 @@ namespace Trasher.Controllers
                 return new KaktamCommandHandler().GetInfo(command);
             }
 
-            if (command.Contains(" img "))
+            if (command.Contains(" img"))
             {
                 return new RandomImageCommandHandler().GetInfo(command);
             }

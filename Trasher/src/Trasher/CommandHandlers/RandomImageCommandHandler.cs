@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using Trasher.CommandHandlers.Services;
 
 namespace Trasher.CommandHandlers
 {
@@ -13,8 +14,36 @@ namespace Trasher.CommandHandlers
     {
         private const string ImageUrlPattern = @"""src"": ""(?<ImageUrl>.*)""";
         private const string TrashKeyword = " трешак";
+        private readonly static RandomWordsService _randomWordsService = new RandomWordsService();
+        private static readonly string _skypeLineSeparator = "  " + Environment.NewLine;
 
         public string GetInfo(string command)
+        {
+            string userWords = GetUserWords(command);
+
+            if (string.IsNullOrEmpty(userWords))
+            {
+                string randomWords = _randomWordsService.GetRandomWords();
+                string randomImageUrl = GetRandomImageUrl(randomWords + TrashKeyword);
+
+                return randomWords
+                       + _skypeLineSeparator
+                       + randomImageUrl;
+            }
+
+            return GetRandomImageUrl(userWords);
+        }
+
+        private string GetRandomImageUrl(string userWords)
+        {
+            List<string> urls = GetUrls(userWords);
+
+            var random = new Random();
+            int randomUrlIndex = random.Next(0, urls.Count);
+            return urls[randomUrlIndex];
+        }
+
+        private static string GetUserWords(string command)
         {
             const string imgCommand = " img ";
             int queryStartIndex = command.IndexOf(imgCommand, StringComparison.Ordinal);
@@ -24,13 +53,8 @@ namespace Trasher.CommandHandlers
             }
 
             string userQuery = command.Substring(queryStartIndex).Replace(imgCommand, string.Empty);
-            string query = userQuery + TrashKeyword;
 
-            List<string> urls = GetUrls(query);
-
-            var random = new Random();
-            int randomUrlIndex = random.Next(0, urls.Count);
-            return urls[randomUrlIndex];
+            return userQuery + TrashKeyword;
         }
 
         private List<string> GetUrls(string command)
@@ -59,7 +83,7 @@ namespace Trasher.CommandHandlers
                     .ToList();
 
                 return urlList.Count == 0 
-                    ? new List<string> { json } 
+                    ? new List<string> { "Интернет сегодня особенно плох, ничего не найдено!" } 
                     : urlList;
             }
         }
